@@ -3,6 +3,29 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
+cc_library_static {
+    name: "multihalwrapper",
+    vendor: true,
+    srcs: [
+        "multihalwrapper/multihal.cpp",
+        "multihalwrapper/SensorEventQueue.cpp",
+    ],
+    header_libs: [
+        "libhardware_headers",
+    ],
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libutils",
+        "libdl",
+    ],
+    export_include_dirs: ["multihalwrapper"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}
+
 cc_library_shared {
     name: "android.hardware.sensors@2.0-subhal-impl-1.0",
     defaults: ["hidl_defaults"],

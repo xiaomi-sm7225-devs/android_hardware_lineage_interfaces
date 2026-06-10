@@ -5,9 +5,24 @@
  */
 
 #include "SensorsSubHal.h"
+#include "multihal.h"
 
 #include <android-base/logging.h>
 #include <android/hardware/sensors/2.0/types.h>
+
+#include <sys/stat.h>
+
+namespace {
+/*
+ * If a multi-hal configuration file exists in the proper location,
+ * return true indicating we need to use multi-hal functionality.
+ */
+static bool UseMultiHal() {
+    const std::string& name = MULTI_HAL_CONFIG_FILE_PATH;
+    struct stat buffer;
+    return (stat(name.c_str(), &buffer) == 0);
+}
+}  // namespace
 
 using ::android::hardware::sensors::V1_0::SensorFlagBits;
 using ::android::hardware::sensors::V1_0::implementation::convertFromRateLevel;
@@ -46,7 +61,11 @@ Result ResultFromStatus(status_t err) {
 SensorsSubHal::SensorsSubHal() : mCallback(nullptr) {
     status_t err = OK;
 
-    err = hw_get_module(SENSORS_HARDWARE_MODULE_ID, (const hw_module_t**)&mSensorModule);
+    if (UseMultiHal()) {
+        mSensorModule = ::get_multi_hal_module_info();
+    } else {
+        err = hw_get_module(SENSORS_HARDWARE_MODULE_ID, (const hw_module_t**)&mSensorModule);
+    }
     if (mSensorModule == nullptr) {
         err = UNKNOWN_ERROR;
     }

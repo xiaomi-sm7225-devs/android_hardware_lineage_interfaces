@@ -47,6 +47,7 @@ cc_library_shared {
     static_libs: [
         "android.hardware.sensors@1.0-convert",
         "android.hardware.sensors@2.X-multihal",
+        "multihalwrapper",
     ],
     vendor: true,
 }
